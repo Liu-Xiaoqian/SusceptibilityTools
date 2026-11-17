@@ -210,10 +210,13 @@ class RhombohedralMultilayer:
         return H
 
     def init_mesh(self, N=4000, kmax=0.06, cutoff=0.025):
-        """Create the momentum mesh and its integration weights."""
+        """Create an inversion-symmetric twisted mesh, or the untwisted disk."""
         kn = np.fft.fftfreq(N)
 
         if self.twist:
+            # Exact k/-k pairs; an even FFT grid instead wraps +1/2 to -1/2,
+            # which is not equivalent with a finite plane-wave truncation.
+            kn = (2 * np.arange(N) - (N - 1)) / (2 * N)
             kx, ky = np.meshgrid(kn, kn)
             self.k = np.stack([kx, ky], axis=-1).reshape(-1, 2).T
         else:
